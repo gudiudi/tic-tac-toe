@@ -13,7 +13,12 @@ const GameBoard = (function() {
   const getBoard = () => board.map((row) => [...row]);
 
   const mark = (marker, row, column) => {
-    if (board[row][column] !== null) return 'Already marked!';
+    if (
+      row >= rows ||
+      column >= columns ||
+      board[row][column] !== null
+    ) return;
+    
     board[row][column] = marker;
   };
 
