@@ -34,40 +34,49 @@ const GameController = (function() {
 
   const checkWin = () => {
     const board = GameBoard.getBoard();
+    let matches = 0;
     
     // Horizontal check
-    for (let i = 0; i < board.length; i++) {
-      const first = board[i][0];
+    for (let row = 0; row < board.length; row++) {
+      const first = board[row][0];
       if (first === null) continue;
-      let isWin = true;
-      for (let j = 1; j < board[i].length; j++) {
-        if (board[i][j] !== first) {
-          isWin = false;
+      for (let col = 0; col < board.length - 1; col++) {
+        if (board[row][col + 1] !== first) {
+          matches = 0;
           break;
         }
+        matches++;
       }
-      if (isWin) return true;
+      if (matches === board.length - 1) return true;
     }
 
-    // Vertical
-    for (let i = 0; i < board.length; i++) {
-      const first = board[0][0];
+    // Vertical check
+    for (let col = 0; col < board.length; col++) {
+      const first = board[0][col];
+      if (first === null) continue;
+      for (let row = 0; row < board.length - 1; row++) {
+        if (board[row + 1][col] !== first) {
+          matches = 0;
+          break;
+        }
+        matches++;
+      }
+      if (matches === board.length - 1) return true;
     }
+
+    // Diagonal check
+    
 
     return false;
   };
 
   const playRound = () => {
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 0, 0);
+    GameBoard.markBoard(getActivePlayer().marker, 0, 1);
     switchActivePlayer();
     
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 1, 0);
-    switchActivePlayer();
-
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 0, 1);
+    GameBoard.markBoard(getActivePlayer().marker, 2, 0);
     switchActivePlayer();
 
     console.log(GameBoard.getBoard());
@@ -75,7 +84,11 @@ const GameController = (function() {
     switchActivePlayer();
 
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 0, 2);
+    GameBoard.markBoard(getActivePlayer().marker, 2, 2);
+    switchActivePlayer();
+
+    console.log(GameBoard.getBoard());
+    GameBoard.markBoard(getActivePlayer().marker, 2, 1);
 
     console.log(GameBoard.getBoard());
     
@@ -83,8 +96,6 @@ const GameController = (function() {
     if (isWin) console.log(`${getActivePlayer().name} win!`);
 
     switchActivePlayer();
-
-    
   };
 
   return { getActivePlayer, playRound };
