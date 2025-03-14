@@ -1,16 +1,9 @@
 const GameBoard = (function() {
   const rows = 3;
   const columns = 3;
-  const board = [];
+  const board = [...Array(rows)].map(() => new Array(columns).fill(null));
 
-  for (let i = 0; i < rows; i++) {
-    board[i] = [];
-    for (let j = 0; j < columns; j++) {
-      board[i].push(null);
-    }
-  }
-
-  const getBoard = () => board.map((row) => [...row]);
+  const get = () => board.map((row) => [...row]);
 
   const mark = (marker, row, column) => {
     if (
@@ -22,10 +15,9 @@ const GameBoard = (function() {
     board[row][column] = marker;
   };
 
-  return { getBoard, mark };
+  return { get, mark };
 })();
 
-GameBoard.getBoard();
-console.log(GameBoard.getBoard());
+console.log(GameBoard.get());
 GameBoard.mark('X', 0, 2);
-console.log(GameBoard.getBoard());
+console.log(GameBoard.get());
