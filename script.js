@@ -12,8 +12,15 @@ const GameBoard = (function() {
 
   const getBoard = () => board.map((row) => [...row]);
 
-  return { getBoard };
+  const mark = (marker, row, column) => {
+    if (board[row][column] !== null) return 'Already marked!';
+    board[row][column] = marker;
+  };
+
+  return { getBoard, mark };
 })();
 
 GameBoard.getBoard();
-console.log(GameBoard.getBoard())
+console.log(GameBoard.getBoard());
+GameBoard.mark('X', 0, 2);
+console.log(GameBoard.getBoard());
