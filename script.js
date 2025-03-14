@@ -34,17 +34,15 @@ const GameController = (function() {
 
   const checkWin = () => {
     const board = GameBoard.getBoard();
-    let matches = 0;
+    
     
     // Horizontal check
     for (let row = 0; row < board.length; row++) {
+      let matches = 0;
       const first = board[row][0];
       if (first === null) continue;
       for (let col = 0; col < board.length - 1; col++) {
-        if (board[row][col + 1] !== first) {
-          matches = 0;
-          break;
-        }
+        if (board[row][col + 1] !== first) break;
         matches++;
       }
       if (matches === board.length - 1) return true;
@@ -52,31 +50,40 @@ const GameController = (function() {
 
     // Vertical check
     for (let col = 0; col < board.length; col++) {
+      let matches = 0;
       const first = board[0][col];
       if (first === null) continue;
       for (let row = 0; row < board.length - 1; row++) {
-        if (board[row + 1][col] !== first) {
-          matches = 0;
-          break;
-        }
+        if (board[row + 1][col] !== first) break;
         matches++;
       }
       if (matches === board.length - 1) return true;
     }
 
     // Diagonal check
-    
+    for (let col = 0; col <= board.length; col += board.length - 1) {
+      let matches = 0;
+      const first = board[0][col];
+      if (first === null) continue;
+      for (let row = 0; row < board.length - 1; row++) {
+        let direction = col - (row + 1);
+        if (col === 0) direction = row + 1;
+        if (board[row + 1][direction] !== first) break;
+        matches++;
+      }
+      if (matches === board.length - 1) return true;
+    }
 
     return false;
   };
 
   const playRound = () => {
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 0, 1);
+    GameBoard.markBoard(getActivePlayer().marker, 0, 0);
     switchActivePlayer();
     
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 2, 0);
+    GameBoard.markBoard(getActivePlayer().marker, 1, 0);
     switchActivePlayer();
 
     console.log(GameBoard.getBoard());
@@ -84,11 +91,11 @@ const GameController = (function() {
     switchActivePlayer();
 
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 2, 2);
+    GameBoard.markBoard(getActivePlayer().marker, 2, 0);
     switchActivePlayer();
 
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 2, 1);
+    GameBoard.markBoard(getActivePlayer().marker, 2, 2);
 
     console.log(GameBoard.getBoard());
     
