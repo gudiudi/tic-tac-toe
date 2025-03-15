@@ -48,6 +48,7 @@ const GameController = (function() {
   const player1 = createPlayer('Steve', 'X');
   const player2 = createAI('Computer', 'O');
 
+  let play = true;
   let activePlayer = player1;
 
   const getActivePlayer = () => activePlayer;
@@ -120,14 +121,22 @@ const GameController = (function() {
   }
 
   const handleTurn = (row, col) => {
+    if (!play) return;
+
     const marked = GameBoard.markBoard(getActivePlayer().marker, row, col);
     if (!marked) return;
 
     const isWin = checkWin();
-    if (isWin) return ScreenController.updateScreen(`${getActivePlayer().marker} win!`);
+    if (isWin) {
+      play = false;
+      return ScreenController.updateScreen(`${getActivePlayer().marker} win!`);
+    }
 
     const isDraw = checkDraw();
-    if (isDraw) return ScreenController.updateScreen("It's a draw!");
+    if (isDraw) {
+      play = false;
+      return ScreenController.updateScreen("It's a draw!");
+    }
     
     switchActivePlayer();
     ScreenController.updateScreen();
