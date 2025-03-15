@@ -3,9 +3,10 @@ const GameBoard = (function() {
   let columns = null;
   let board = [];
 
-  const createBoard = (r, c) => {
-    rows = r;
-    columns = c;
+  const createBoard = (cell) => {
+    if (cell <= 1 && cell > 16) return;
+    rows = cell;
+    columns = cell;
     board = [...Array(rows)].map(() => new Array(columns).fill(null));
   }
 
@@ -132,6 +133,7 @@ const ScreenController = (function() {
 
   const updateScreen = (board, activePlayer) => {
     turnDiv.textContent = `${activePlayer.marker}'s turn`;
+    boardDiv.style.setProperty('--cell-count', board.length);
     createCellDiv(board)
   };
 
@@ -149,8 +151,9 @@ const ScreenController = (function() {
 })();
 
 const init = (function() {
-  GameBoard.createBoard(3, 3);
+  GameBoard.createBoard(16);
   const board = GameBoard.getBoard();
+  
   GameController.handleTurn();
   ScreenController.updateScreen(board, GameController.getActivePlayer());
 })();
