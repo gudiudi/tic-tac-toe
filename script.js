@@ -45,7 +45,7 @@ const createAI = (name, marker) => {
 };
 
 const GameController = (function() {
-  const player1 = createPlayer('Steve', 'X');
+  const player1 = createPlayer('Player', 'X');
   const player2 = createAI('Computer', 'O');
 
   let play = true;
@@ -118,7 +118,14 @@ const GameController = (function() {
   const checkDraw = () => {
     const board = GameBoard.getBoard();
     return !board.some(row => row.includes(null));
-  }
+  };
+
+  const reset = () => {
+    play = true;
+    activePlayer = player1;
+    GameBoard.createBoard(GameBoard.getBoard().length);
+    ScreenController.updateScreen();
+  };
 
   const handleTurn = (row, col) => {
     if (!play) return;
@@ -142,7 +149,7 @@ const GameController = (function() {
     ScreenController.updateScreen();
   };
 
-  return { getActivePlayer, handleTurn };
+  return { getActivePlayer, handleTurn, reset };
 })();
 
 const ScreenController = (function() {
@@ -176,7 +183,7 @@ const ScreenController = (function() {
 })();
 
 const init = (function() {
-  GameBoard.createBoard(3);
+  GameBoard.createBoard(4);
   ScreenController.updateScreen();
 
   const boardDiv = document.querySelector('.board');
@@ -186,11 +193,15 @@ const init = (function() {
       if (GameController.getActivePlayer().name !== 'Computer') GameController.handleTurn(selectedCell.row, selectedCell.col);
     }
   });
-})();
 
+  const resetBtn = document.querySelector('.reset');
+  resetBtn.addEventListener('click', (e) => {
+    GameController.reset();
+  });
+})();
 
 /*
 TODO
-Stop when the game is over (win, draw)
 Change cell count
+Ability to change marker
 */
