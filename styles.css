@@ -28,6 +28,10 @@ body {
   transform: rotate(360deg);
 }
 
+.reset:active {
+  transform: rotate(0deg);
+}
+
 .board {
   --board-size: 350px;
   --cell-count: 3;
