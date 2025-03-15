@@ -17,9 +17,9 @@ const GameBoard = (function() {
       row >= rows ||
       column >= columns ||
       board[row][column] !== null
-    ) return;
+    ) return false;
     
-    board[row][column] = marker;
+    return board[row][column] = marker;
   };
 
   return { createBoard, getBoard, markBoard };
@@ -31,15 +31,15 @@ const createPlayer = (name, marker) => {
 
 const createAI = (name, marker) => {
   const makeMove = (board) => {
-    const unoccupiedCells = [];
+    const unmarkedCells = [];
     board.forEach((row, rowIndex) => {
       row.forEach((col, colIndex) => {
         if (col === null) {
-          unoccupiedCells.push({ row: rowIndex, col: colIndex });
+          unmarkedCells.push({ row: rowIndex, col: colIndex });
         }
       });
     });
-    return unoccupiedCells[Math.floor(Math.random() * unoccupiedCells.length)];
+    return unmarkedCells[Math.floor(Math.random() * unmarkedCells.length)];
   };
   return { name, marker, makeMove };
 };
@@ -52,7 +52,18 @@ const GameController = (function() {
 
   const getActivePlayer = () => activePlayer;
 
-  const switchActivePlayer = () => (activePlayer === player1) ? activePlayer = player2 : activePlayer = player1;
+  const switchActivePlayer = () => {
+    if (activePlayer === player1) {
+      activePlayer = player2;
+      const AIMove = player2.makeMove(GameBoard.getBoard());
+      
+      setTimeout(() => {
+        handleTurn(AIMove.row, AIMove.col);
+      }, 300);
+    } else {
+      activePlayer = player1;
+    }
+  };
 
   const horizontalCheck = (board) => {
     for (let row = 0; row < board.length; row++) {
@@ -98,30 +109,22 @@ const GameController = (function() {
     return false;
   };
 
-  const checkWin = (board) => {
+  const checkWin = () => {
+    const board = GameBoard.getBoard();
     return (horizontalCheck(board) || verticalCheck(board) || diagonalCheck(board));
   };
 
-  const handleTurn = () => {
-    console.log(GameBoard.getBoard());
+  const handleTurn = (row, col) => {
+    const marked = GameBoard.markBoard(getActivePlayer().marker, row, col);
+    if (!marked) return;
 
-    const playerMove = {row: 0, col: 2};
-    GameBoard.markBoard(getActivePlayer().marker, playerMove.row, playerMove.col);
-
-    console.log(GameBoard.getBoard());
-
-    if (checkWin(GameBoard.getBoard())) console.log(`${getActivePlayer().name} win!`);
-
-    switchActivePlayer();
-
-    const AIMove = player2.makeMove(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, AIMove.row, AIMove.col);
-
-    console.log(GameBoard.getBoard());
-
-    if (checkWin(GameBoard.getBoard())) console.log(`${getActivePlayer().name} win!`);
+    if (checkWin()) {
+      ScreenController.updateScreen();
+      return console.log(`${getActivePlayer().name} win!`);
+    }
     
     switchActivePlayer();
+    ScreenController.updateScreen();
   };
 
   return { getActivePlayer, handleTurn };
@@ -131,18 +134,25 @@ const ScreenController = (function() {
   const turnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
 
-  const updateScreen = (board, activePlayer) => {
+  const updateScreen = () => {
+    const board = GameBoard.getBoard();
+    const activePlayer = GameController.getActivePlayer();
+
     turnDiv.textContent = `${activePlayer.marker}'s turn`;
     boardDiv.style.setProperty('--cell-count', board.length);
+    boardDiv.innerHTML = '';
     createCellDiv(board)
   };
 
   const createCellDiv = (board) => {
     for (let cell = 0; cell < board.length * board.length; cell++) {
+      const row = Math.floor(cell / board.length);
+      const col = cell % board.length;
       const cellDiv = document.createElement('div');
+      cellDiv.textContent = board[row][col];
       cellDiv.className = 'cell';
-      cellDiv.dataset.row = Math.floor(cell / board.length);
-      cellDiv.dataset.col = cell % board.length;
+      cellDiv.dataset.row = row;
+      cellDiv.dataset.col = col;
       boardDiv.appendChild(cellDiv);
     }
   }
@@ -151,9 +161,22 @@ const ScreenController = (function() {
 })();
 
 const init = (function() {
-  GameBoard.createBoard(16);
-  const board = GameBoard.getBoard();
-  
-  GameController.handleTurn();
-  ScreenController.updateScreen(board, GameController.getActivePlayer());
+  GameBoard.createBoard(3);
+  ScreenController.updateScreen();
+
+  const boardDiv = document.querySelector('.board');
+  boardDiv.addEventListener('click', (e) => {
+    if (e.target.className = 'cell') {
+      const selectedCell = { ...e.target.dataset };
+      if (GameController.getActivePlayer().name !== 'Computer') GameController.handleTurn(selectedCell.row, selectedCell.col);
+    }
+  });
 })();
+
+
+/*
+TODO
+Stop when the game is over (win, draw)
+Notify the player
+Change cell count
+*/

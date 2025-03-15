@@ -8,6 +8,10 @@ body {
   box-sizing: border-box;
 }
 
+.turn {
+  margin-bottom: 5px;
+}
+
 .board {
   --board-size: 350px;
   --cell-count: 3;
