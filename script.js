@@ -22,9 +22,24 @@ const createPlayer = (name, marker) => {
   return { name, marker };
 };
 
+const createAI = (name, marker) => {
+  const makeMove = (board) => {
+    const unoccupiedCells = [];
+    board.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
+        if (col === null) {
+          unoccupiedCells.push({ row: rowIndex, col: colIndex });
+        }
+      });
+    });
+    return unoccupiedCells[Math.floor(Math.random() * unoccupiedCells.length)];
+  };
+  return { name, marker, makeMove };
+};
+
 const GameController = (function() {
   const player1 = createPlayer('Steve', 'X');
-  const player2 = createPlayer('Computer', 'O');
+  const player2 = createAI('Computer', 'O');
 
   let activePlayer = player1;
 
@@ -80,38 +95,29 @@ const GameController = (function() {
     return (horizontalCheck(board) || verticalCheck(board) || diagonalCheck(board));
   };
 
-  const playRound = () => {
+  const handleTurn = () => {
     console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 0, 3);
+
+    const playerMove = {row: 0, col: 3};
+    GameBoard.markBoard(getActivePlayer().marker, playerMove.row, playerMove.col);
+
+    console.log(GameBoard.getBoard());
+
+    if (checkWin(GameBoard.getBoard())) console.log(`${getActivePlayer().name} win!`);
+
     switchActivePlayer();
+
+    const AIMove = player2.makeMove(GameBoard.getBoard());
+    GameBoard.markBoard(getActivePlayer().marker, AIMove.row, AIMove.col);
+
+    console.log(GameBoard.getBoard());
+
+    if (checkWin(GameBoard.getBoard())) console.log(`${getActivePlayer().name} win!`);
     
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 1, 0);
-    switchActivePlayer();
-
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 1, 2);
-    switchActivePlayer();
-
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 2, 0);
-    switchActivePlayer();
-
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 2, 1);
-
-    console.log(GameBoard.getBoard());
-    GameBoard.markBoard(getActivePlayer().marker, 3, 0);
-
-    console.log(GameBoard.getBoard());
-    
-    const isWin = checkWin(GameBoard.getBoard());
-    if (isWin) console.log(`${getActivePlayer().name} win!`);
-
     switchActivePlayer();
   };
 
-  return { getActivePlayer, playRound };
+  return { getActivePlayer, handleTurn };
 })();
 
-GameController.playRound();
+GameController.handleTurn();
