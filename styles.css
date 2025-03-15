@@ -1,0 +1,40 @@
+body {
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.board {
+  --board-size: 350px;
+  --cell-count: 3;
+
+  width: var(--board-size);
+  display: grid;
+  grid-template-columns: repeat(var(--cell-count), 1fr);
+  gap: 5px;
+}
+
+.cell {
+  --font-size: calc(var(--board-size) / (var(--cell-count) * 2));
+  
+  aspect-ratio: 1;
+  width: 100%;
+  border: none;
+  background-color: #F0F0F0;
+  font-size: var(--font-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background-color: #E0E0E0;
+  transform: scale(1.03);
+  transition: background-color 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+}

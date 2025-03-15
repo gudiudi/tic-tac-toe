@@ -1,7 +1,13 @@
 const GameBoard = (function() {
-  const rows = 4;
-  const columns = 4;
-  const board = [...Array(rows)].map(() => new Array(columns).fill(null));
+  let rows = null;
+  let columns = null;
+  let board = [];
+
+  const createBoard = (r, c) => {
+    rows = r;
+    columns = c;
+    board = [...Array(rows)].map(() => new Array(columns).fill(null));
+  }
 
   const getBoard = () => board.map((row) => [...row]);
 
@@ -15,7 +21,7 @@ const GameBoard = (function() {
     board[row][column] = marker;
   };
 
-  return { getBoard, markBoard };
+  return { createBoard, getBoard, markBoard };
 })();
 
 const createPlayer = (name, marker) => {
@@ -98,7 +104,7 @@ const GameController = (function() {
   const handleTurn = () => {
     console.log(GameBoard.getBoard());
 
-    const playerMove = {row: 0, col: 3};
+    const playerMove = {row: 0, col: 2};
     GameBoard.markBoard(getActivePlayer().marker, playerMove.row, playerMove.col);
 
     console.log(GameBoard.getBoard());
@@ -125,7 +131,7 @@ const ScreenController = (function() {
   const boardDiv = document.querySelector('.board');
 
   const updateScreen = (board, activePlayer) => {
-    turnDiv.textContent = activePlayer;
+    turnDiv.textContent = `${activePlayer.marker}'s turn`;
     createCellDiv(board)
   };
 
@@ -143,6 +149,7 @@ const ScreenController = (function() {
 })();
 
 const init = (function() {
+  GameBoard.createBoard(3, 3);
   const board = GameBoard.getBoard();
   GameController.handleTurn();
   ScreenController.updateScreen(board, GameController.getActivePlayer());
