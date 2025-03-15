@@ -120,4 +120,30 @@ const GameController = (function() {
   return { getActivePlayer, handleTurn };
 })();
 
-GameController.handleTurn();
+const ScreenController = (function() {
+  const turnDiv = document.querySelector('.turn');
+  const boardDiv = document.querySelector('.board');
+
+  const updateScreen = (board, activePlayer) => {
+    turnDiv.textContent = activePlayer;
+    createCellDiv(board)
+  };
+
+  const createCellDiv = (board) => {
+    for (let cell = 0; cell < board.length * board.length; cell++) {
+      const cellDiv = document.createElement('div');
+      cellDiv.className = 'cell';
+      cellDiv.dataset.row = Math.floor(cell / board.length);
+      cellDiv.dataset.col = cell % board.length;
+      boardDiv.appendChild(cellDiv);
+    }
+  }
+
+  return { updateScreen }
+})();
+
+const init = (function() {
+  const board = GameBoard.getBoard();
+  GameController.handleTurn();
+  ScreenController.updateScreen(board, GameController.getActivePlayer());
+})();
