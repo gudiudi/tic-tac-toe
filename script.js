@@ -114,14 +114,20 @@ const GameController = (function() {
     return (horizontalCheck(board) || verticalCheck(board) || diagonalCheck(board));
   };
 
+  const checkDraw = () => {
+    const board = GameBoard.getBoard();
+    return !board.some(row => row.includes(null));
+  }
+
   const handleTurn = (row, col) => {
     const marked = GameBoard.markBoard(getActivePlayer().marker, row, col);
     if (!marked) return;
 
-    if (checkWin()) {
-      ScreenController.updateScreen();
-      return console.log(`${getActivePlayer().name} win!`);
-    }
+    const isWin = checkWin();
+    if (isWin) return ScreenController.updateScreen(`${getActivePlayer().marker} win!`);
+
+    const isDraw = checkDraw();
+    if (isDraw) return ScreenController.updateScreen("It's a draw!");
     
     switchActivePlayer();
     ScreenController.updateScreen();
@@ -134,11 +140,11 @@ const ScreenController = (function() {
   const turnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
 
-  const updateScreen = () => {
+  const updateScreen = (msg) => {
     const board = GameBoard.getBoard();
     const activePlayer = GameController.getActivePlayer();
 
-    turnDiv.textContent = `${activePlayer.marker}'s turn`;
+    turnDiv.textContent = (msg) ? msg : `${activePlayer.marker}'s turn`;
     boardDiv.style.setProperty('--cell-count', board.length);
     boardDiv.innerHTML = '';
     createCellDiv(board)
@@ -166,7 +172,7 @@ const init = (function() {
 
   const boardDiv = document.querySelector('.board');
   boardDiv.addEventListener('click', (e) => {
-    if (e.target.className = 'cell') {
+    if (e.target.className === 'cell') {
       const selectedCell = { ...e.target.dataset };
       if (GameController.getActivePlayer().name !== 'Computer') GameController.handleTurn(selectedCell.row, selectedCell.col);
     }
@@ -177,6 +183,5 @@ const init = (function() {
 /*
 TODO
 Stop when the game is over (win, draw)
-Notify the player
 Change cell count
 */
